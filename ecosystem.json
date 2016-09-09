@@ -25,7 +25,7 @@
   deploy : {
     production : {
       user : "clu",
-      host : "botlab-labwork.southeastasia.cloudapp.azure.com",
+      host : "clu@botlab-labwork.eastasia.cloudapp.azure.com",
       ref  : "origin/master",
       repo : "git@github.com:zypeh/IsuzumiChan.git",
       path : "/home/clu/production",
