@@ -7,13 +7,13 @@
 
     // First application
     {
-      name      : "unistay-internal",
+      name      : "IsuzumiChan",
       script    : "index.js",
       env: {
         COMMON_VARIABLE: "true"
       },
       env_production : {
-        NODE_ENV: "dev" // Change to production later
+        NODE_ENV: "production"
       }
     }
   ],
@@ -25,7 +25,7 @@
   deploy : {
     production : {
       user : "clu",
-      host : "clu@botlab-labwork.eastasia.cloudapp.azure.com",
+      host : "botlab-labwork.eastasia.cloudapp.azure.com",
       ref  : "origin/master",
       repo : "git@github.com:zypeh/IsuzumiChan.git",
       path : "/home/clu/production",
