@@ -6,12 +6,9 @@
 ## How to use
 * Clone it from github
 * Ask for a API token from `@botfather`
-* Append the API token to the token variable
+* Append the API token to the token variable, it's in `/src/configs.js`
 ```js
-// API token here
-const token = '197973471:AAE-8hOhycXdD3StG2G07nVx9QHWgrmIXs8'
-// Setup polling way
-const bot = new TelegramBot(token, { polling: { timeout: 3, interval: 1000 } })
+export const Token = 'API TOKEN HERE'
 ```
 
 ---

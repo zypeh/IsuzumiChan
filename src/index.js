@@ -2,10 +2,10 @@
 
 import TelegramBot from 'node-telegram-bot-api'
 import controllers from './controllers'
+import { Token } from './configs'
 
-const token = '197973471:AAE-8hOhycXdD3StG2G07nVx9QHWgrmIXs8'
 // Setup polling way
-const bot = new TelegramBot(token, { polling: { timeout: 3, interval: 1000 } })
+const bot = new TelegramBot(Token, { polling: { timeout: 3, interval: 1000 } })
 
 Object.keys(controllers).forEach((key) => {
   const func = controllers[key]
