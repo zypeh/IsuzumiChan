@@ -37,17 +37,25 @@ export default (bot) => {
     const cmdId = msg.message_id
 
     if (isForwarded(msg))
-      if (!isOwner(msg))
+      if (!isOwner(msg)) {
         bot.sendMessage(msg.chat.id, `@${msg.from.username} 假冒主人的令牌是不明智的选择 ._.🏻`)
+        return
+      }
       else { }
 
-    if (!isOwner(msg)) bot.sendMessage(msg.chat.id, `这是禁止事项， 你没有这个权限 🈲️ `, {
-      reply_to_message_id: msg.message_id
-    })
+    if (!isOwner(msg)) {
+      bot.sendMessage(msg.chat.id, `这是禁止事项， 你没有这个权限 🈲️ `, {
+        reply_to_message_id: msg.message_id
+      })
+      return
+    }
 
-    if (isPrivate(msg) && isOwner(msg)) bot.sendMessage(msg.chat.id, geekyStat(), {
-      reply_to_message_id: msg.message_id
-    })
+    if (isPrivate(msg) && isOwner(msg)) {
+      bot.sendMessage(msg.chat.id, geekyStat(), {
+        reply_to_message_id: msg.message_id
+      })
+      return
+    }
 
     bot.sendMessage(msg.chat.id, `诶，这里不是私聊，这样可以吗?`, {
       reply_markup: JSON.stringify({
@@ -81,7 +89,7 @@ export default (bot) => {
             bot.sendMessage(msg.message.chat.id, `@${msg.from.username} 不是在问你啦 😑`)
             spammer.push(msg.from.id) // ignore those who spam
           } else
-            bot.sendMessage(msg.message.chat.id, '好的', { reply_to_message_id: cmdId })
+            bot.editMessageText('好的, 我不说 🙊', { chat_id: msg.message.chat.id, message_id: msg.message.message_id })
           break
       }
       bot.answerCallbackQuery(msg.id, '')
