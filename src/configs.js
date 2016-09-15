@@ -1,3 +1,4 @@
 'use strict'
 
-export const Token = 'API token here'
+export const Token = ''
+export const databaseURL = ''
