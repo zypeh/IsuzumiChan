@@ -1,5 +1,9 @@
 'use strict'
 
+import mongoose from 'mongoose'
+
+import { databaseURL } from '../src/configs'
+
 export const readableFileSize = (fileSizeInBytes) => {
     let i = -1
     const byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB']
@@ -31,3 +35,17 @@ export const isPrivate = (msg) => {
   else
     return false
 }
+
+export default mongoose
+
+mongoose.connection
+  .on('error', error => {
+    console.log(`[!] Unable to connect to database.`)
+    mongoose.disconnect() // beware! Will disconnect all database connection
+  })
+
+  .on('close', () => {
+    console.log(`[=]  Database connection closed.`)
+  })
+
+  .once('open', () => console.log(`[*]  Connected to ${mongoose.connections[0].host}:${mongoose.connections[0].port}/${mongoose.connections[0].name}`))
