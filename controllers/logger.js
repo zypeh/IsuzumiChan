@@ -19,6 +19,8 @@ const MessageSchema = new mongoose.Schema({
     id: { type: Number },
   },
   sticker: { type: Object, default: undefined },
+  documents: { type: Object, default: undefined },
+  photo: { type: Array, default: undefined },
   from : {
     username: { type: String },
     id: { type: Number },
@@ -49,6 +51,16 @@ export default (bot) => {
             break
           }
 
+          if ('photo' in msg) {
+            optx.photo = msg.photo
+            break
+          }
+
+          if ('document' in msg) {
+            optx.documents = msg.document
+            break
+          }
+
           optx.msg_content = [...msg.text]
           optx.chat.type = msg.chat.type
           optx.chat.id = msg.chat.id
@@ -61,10 +73,13 @@ export default (bot) => {
       } while (false)
         const new_msg = new Message(optx)
         new_msg.save()
+
+        const log_msg = new Log(optx)
+
       } catch (err) { console.log(err) }
     })
 
-    bot.onText(/^\/search (.+)$/, (msg, match) => {
+    bot.onText(/^\/search_all (.+)$/, (msg, match) => {
       if (isForwarded(msg)) { return }
       if (!isOwner(msg)) { return }
 
@@ -92,6 +107,37 @@ export default (bot) => {
           })
         return
       } catch (err) { console.log(err) }
-
     })
+
+    bot.onText(/^\/search (.+)$/, (msg, match) => {
+      if (isForwarded(msg)) { return }
+      if (!isOwner(msg)) { return }
+
+      try {
+        const query = [...match[1]]
+        console.log(query)
+        Message.find({ msg_content: {$all: query }})
+          .where({ entities: { $exists: false } }) // ignore commands
+          .where({ 'chat.id': msg.chat.id }) // only this group only
+          .limit(10)
+          .exec((err, results) => {
+
+            console.log(results)
+            if (err) {
+              bot.sendMessage(msg.chat.id, `擦！我昏了\n报错讯息: \`@{err}\``, {
+                parse_mode: 'markdown'
+              })
+              console.log(err)
+              return
+            }
+            if (!(results.length > 0)) {
+              bot.sendMessage(msg.chat.id, `没有找到结果啊亲～ `)
+              return
+            }
+            results.forEach((result) => bot.forwardMessage(msg.chat.id, result.chat.id, result.message_id))
+          })
+        return
+      } catch (err) { console.log(err) }
+    })
+    
 }
