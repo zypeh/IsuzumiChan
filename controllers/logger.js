@@ -28,14 +28,38 @@ const MessageSchema = new mongoose.Schema({
   message_id: { type: Number }
 })
 
+const LogSchema = new mongoose.Schema({
+  entities: { type: Object, default: undefined },
+  msg_content: { type: Array, default: undefined }, // text index, text
+  date: { type: Number },
+  chat: {
+    type: { type: String },
+    title: { type: String, default: undefined }, // for group
+    username: { type: String, default: undefined }, // for username, if private
+    id: { type: Number },
+  },
+  sticker: { type: Object, default: undefined },
+  documents: { type: Object, default: undefined },
+  photo: { type: Array, default: undefined },
+  reply_to_message: { type: Array, default: undefined },
+  from : {
+    username: { type: String },
+    id: { type: Number },
+  },
+  message_id: { type: Number }
+})
+
 MessageSchema.index({ msg_content: 1 })
+LogSchema.index({ msg_content: 1 })
 
 const Message = mongoose.model('Message', MessageSchema)
+const Log = mongoose.model('Log', LogSchema)
 
 export default (bot) => {
     bot.on('message', (msg) => {
       try {
         let optx = { chat: {}, from: {} }
+        let is_log = false
 
         do {
           optx.date = msg.date
@@ -48,6 +72,11 @@ export default (bot) => {
 
           if ('sticker' in msg) {
             optx.sticker = msg.sticker
+            break
+          }
+
+          if ('reply_to_message' in msg) {
+            optx.reply_to_message = msg.reply_to_message
             break
           }
 
@@ -73,8 +102,6 @@ export default (bot) => {
       } while (false)
         const new_msg = new Message(optx)
         new_msg.save()
-
-        const log_msg = new Log(optx)
 
       } catch (err) { console.log(err) }
     })
@@ -139,5 +166,37 @@ export default (bot) => {
         return
       } catch (err) { console.log(err) }
     })
-    
+
+    bot.onText(/^\/log_this$/, (msg) => {
+      if (isForwarded(msg))
+        if (!isOwner(msg)) {
+          bot.sendMessage(msg.chat.id, `@${msg.from.username} 假冒主人的令牌是不明智的选择 ._.🏻`)
+          return
+        }
+        else { }
+
+      if (!('reply_to_message' in msg)) { return }
+
+      if (!isOwner(msg)) {
+        bot.sendMessage(msg.chat.id, `这是禁止事项， 你没有这个权限 🈲️ `, {
+          reply_to_message_id: msg.message_id
+        })
+        return
+      }
+
+      bot.forwardMessage(msg.from.id, msg.reply_to_message.chat.id, msg.reply_to_message.message_id)
+
+      const reply_message = msg.reply_to_message
+      const log = new Log({
+        message_id: reply_message.message_id,
+        from: reply_message.from,
+        chat: reply_message.chat,
+        date: reply_message.date,
+        msg_content: [...reply_message.text]
+      })
+      log.save()
+
+      bot.sendMessage(msg.chat.id, `📝 已经记录下来了 (认真脸)`)
+    })
+
 }
